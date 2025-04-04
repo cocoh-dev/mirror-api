@@ -1,0 +1,68 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'kr.cocoh'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'  // Express 대체
+    implementation 'org.springframework.boot:spring-boot-starter-security'  // 인증/인가 (bcrypt, passport 대체)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'  // express-validator 대체
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'  // OAuth (Google, Kakao, Naver) 대체
+
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    
+    // JWT 지원
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+    // AWS SDK
+    implementation 'com.amazonaws:aws-java-sdk:1.12.529'
+    
+    // Rate Limiting
+    implementation 'com.bucket4j:bucket4j-core:8.3.0'
+    
+    // Swagger/OpenAPI 문서화
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    
+    // 로깅
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    
+    // 세션 관리
+    implementation 'org.springframework.session:spring-session-jdbc'
+    
+    // CORS 및 보안
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
