@@ -53,11 +53,10 @@ public class AdLocation {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        validate(); // 검증 메서드 호출
     }
     
     // Validation methods
-    @PrePersist
-    @PreUpdate
     protected void validate() {
         if (this.targetType == TargetType.nationwide) {
             if (this.city != null || this.district != null) {

@@ -26,6 +26,7 @@ public class Display {
     private Long id;
     
     @Column(name = "device_id", nullable = false, unique = true)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID deviceId;
     
     @Column(nullable = false, length = 100)

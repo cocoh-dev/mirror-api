@@ -1,5 +1,7 @@
 package kr.cocoh.api.model.auth;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +9,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -39,13 +42,13 @@ public class Location {
     
     @Min(-90)
     @Max(90)
-    @Column(nullable = false, precision = 10, scale = 8)
-    private Double latitude;
-    
+    @Column(nullable = false)
+    private BigDecimal latitude;
+
     @Min(-180)
     @Max(180)
-    @Column(nullable = false, precision = 11, scale = 8)
-    private Double longitude;
+    @Column(nullable = false)
+    private BigDecimal longitude;
     
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
