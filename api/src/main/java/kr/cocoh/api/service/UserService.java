@@ -1,5 +1,15 @@
 package kr.cocoh.api.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.cocoh.api.dto.UserDto;
 import kr.cocoh.api.model.auth.User;
 import kr.cocoh.api.model.auth.UserActivity;
@@ -9,16 +19,6 @@ import kr.cocoh.api.repository.UserActivityRepository;
 import kr.cocoh.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -162,7 +162,7 @@ public class UserService {
         UserActivity activity = UserActivity.builder()
                 .user(user)
                 .activityType(activityType)
-                .details(details != null ? details.toString() : null)
+                .details(details != null ? details : null)
                 .build();
 
         return userActivityRepository.save(activity);
