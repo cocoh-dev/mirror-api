@@ -8,7 +8,8 @@
             "mainClass": "kr.cocoh.api.ApiApplication",
             "projectName": "api",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal"
         }
     ]
 }

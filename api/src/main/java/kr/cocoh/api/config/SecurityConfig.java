@@ -37,6 +37,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .formLogin(formLogin -> formLogin.disable())  // 폼 로그인 비활성화
+            .httpBasic(httpBasic -> httpBasic.disable())  // HTTP 기본 인증 비활성화
+            .csrf(csrf -> csrf.disable())  
             // CSRF 보호 비활성화 (REST API로 사용)
             .csrf(AbstractHttpConfigurer::disable)
             // CORS 설정 활성화
@@ -46,7 +49,8 @@ public class SecurityConfig {
             // 요청에 대한 권한 설정
             .authorizeHttpRequests(auth -> auth
                 // 공개 엔드포인트
-                .requestMatchers("/auth/**", "/api/public/**", "/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/auth/**", "/api/public/**").permitAll()
                 // 관리자 전용 엔드포인트
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
                 // 슈퍼 관리자 전용 엔드포인트

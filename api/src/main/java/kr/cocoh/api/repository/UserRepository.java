@@ -1,8 +1,9 @@
 package kr.cocoh.api.repository;
 
-import kr.cocoh.api.model.auth.User;
-import kr.cocoh.api.model.auth.enums.Provider;
-import kr.cocoh.api.model.auth.enums.Role;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,16 +11,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import kr.cocoh.api.model.auth.User;
+import kr.cocoh.api.model.auth.enums.Provider;
+import kr.cocoh.api.model.auth.enums.Role;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
+
     Optional<User> findByEmail(String email);
     
-    Optional<User> findByEmailAndProvider(String email, String provider);
+    Optional<User> findByEmailAndProvider(String email, Provider provider);
     
     Optional<User> findByRefreshToken(String refreshToken);
     

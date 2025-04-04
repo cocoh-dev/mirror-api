@@ -1,5 +1,6 @@
 package kr.cocoh.api.security;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Collection;
@@ -50,10 +51,11 @@ public class JwtTokenProvider {
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-        key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
-        refreshKey = Keys.hmacShaKeyFor(refreshSecretKey.getBytes());
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.key = Keys.hmacShaKeyFor(Base64.getEncoder().encode(keyBytes));
+        
+        byte[] refreshKeyBytes = refreshSecretKey.getBytes(StandardCharsets.UTF_8);
+        this.refreshKey = Keys.hmacShaKeyFor(Base64.getEncoder().encode(refreshKeyBytes));
     }
 
     // 액세스 토큰 생성
@@ -182,6 +184,20 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return false;
+        }
+    }
+    // 토큰 검증
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(refreshKey)
                     .build()
                     .parseClaimsJws(token);
             
