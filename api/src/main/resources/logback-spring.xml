@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="logs" />
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
 
-    <!-- 콘솔 로그 설정 -->
+    <!-- 기본 Spring Boot 설정 포함 (clr, highlight 등 사용 가능하게 해줌) -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <!-- 로그 저장 위치와 패턴 -->
+    <property name="LOG_PATH" value="logs" />
+    <property name="LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr([%thread]){cyan} %clr(%-5level){yellow} %clr(%logger{36}){blue} - %msg%n" />
+    <property name="FILE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <!-- 콘솔 로그 (컬러 출력용) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- INFO 레벨 로그 파일 설정 -->
+    <!-- 로그 파일: info -->
     <appender name="FILE-INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/info.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -19,7 +25,7 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
+            <pattern>${FILE_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/info-%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -27,14 +33,14 @@
         </rollingPolicy>
     </appender>
 
-    <!-- ERROR 레벨 로그 파일 설정 -->
+    <!-- 로그 파일: error -->
     <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/error.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
         <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
+            <pattern>${FILE_PATTERN}</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/error-%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -42,21 +48,17 @@
         </rollingPolicy>
     </appender>
 
-    <!-- 비동기 로깅 설정 -->
+    <!-- 비동기 처리 -->
     <appender name="ASYNC-INFO" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="FILE-INFO" />
-        <queueSize>512</queueSize>
-        <discardingThreshold>0</discardingThreshold>
     </appender>
 
     <appender name="ASYNC-ERROR" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="FILE-ERROR" />
-        <queueSize>512</queueSize>
-        <discardingThreshold>0</discardingThreshold>
     </appender>
 
-    <!-- 프로파일별 로그 설정 -->
-    <springProfile name="development,default">
+    <!-- 개발 환경 (default, development 프로파일) -->
+    <springProfile name="default,development">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="ASYNC-INFO" />
@@ -64,17 +66,28 @@
         </root>
         <logger name="kr.cocoh" level="DEBUG" />
         <logger name="org.hibernate.SQL" level="DEBUG" />
-        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
     </springProfile>
 
+    <!-- 운영 환경 -->
     <springProfile name="production">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="ASYNC-INFO" />
             <appender-ref ref="ASYNC-ERROR" />
         </root>
-        <logger name="kr.cocoh" level="INFO" />
-        <logger name="org.hibernate.SQL" level="INFO" />
     </springProfile>
 
 </configuration>
+<!--
+    - INFO 레벨 로그는 info.log에 저장되며, 매일 새로운 파일로 롤링됩니다.
+    - ERROR 레벨 로그는 error.log에 저장되며, 매일 새로운 파일로 롤링됩니다.
+    - INFO 레벨 로그는 비동기적으로 처리되어 성능을 향상시킵니다.
+    - 개발 환경에서는 DEBUG 레벨 로그를 출력합니다.
+    - 운영 환경에서는 INFO 레벨 로그만 출력합니다.
+    - 로그 파일은 logs 디렉토리에 저장됩니다.
+    - 로그 파일은 최대 30일 동안 보관됩니다.
+    - 콘솔 로그는 컬러로 출력됩니다.
+    - 로그 패턴은 %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n 형식입니다.
+    - 로그 파일 패턴은 %d{yyyy-MM-dd} 형식입니다.
+    - 로그 파일 이름은 info-YYYY-MM-DD.log 또는 error-YYYY-MM-DD.log 형식입니다.
+-->

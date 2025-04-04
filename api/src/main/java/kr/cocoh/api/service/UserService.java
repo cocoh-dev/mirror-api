@@ -39,7 +39,7 @@ public class UserService {
     /**
      * 이메일과 인증 제공자로 사용자 조회
      */
-    public Optional<User> findByEmailAndProvider(String email, String provider) {
+    public Optional<User> findByEmailAndProvider(String email, Provider provider) {
         return userRepository.findByEmailAndProvider(email, provider);
     }
 
@@ -82,7 +82,7 @@ public class UserService {
      */
     @Transactional
     public User login(String email, String password) {
-        User user = userRepository.findByEmailAndProvider(email, "local")
+        User user = userRepository.findByEmailAndProvider(email, Provider.LOCAL)
                 .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
 
         if (!user.validatePassword(password)) {

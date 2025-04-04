@@ -1,12 +1,9 @@
 package kr.cocoh.api.security.oauth2;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import kr.cocoh.api.model.auth.User;
-import kr.cocoh.api.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -15,12 +12,15 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import kr.cocoh.api.model.auth.User;
+import kr.cocoh.api.model.auth.enums.Provider;
+import kr.cocoh.api.repository.UserRepository;
 import kr.cocoh.api.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -47,10 +47,20 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // 사용자 정보 및 제공자 식별
             Map<String, Object> attributes = oAuth2User.getAttributes();
             String email = getEmail(attributes);
-            String provider = getProviderFromRequest(request);
-            
+            String providerString = getProviderFromRequest(request);
+
+            // 문자열을 Provider enum으로 변환
+            Provider providerEnum;
+            try {
+                providerEnum = Provider.valueOf(providerString.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                log.error("지원하지 않는 제공자: {}", providerString);
+                // 기본값 설정 또는 예외 처리
+                providerEnum = Provider.LOCAL; // 또는 적절한 기본값
+            }
+
             // 데이터베이스에서 사용자 조회
-            Optional<User> userOptional = userRepository.findByEmailAndProvider(email, provider);
+            Optional<User> userOptional = userRepository.findByEmailAndProvider(email, providerEnum);
             
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
@@ -78,7 +88,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 
                 getRedirectStrategy().sendRedirect(request, response, targetUrl);
             } else {
-                log.error("사용자를 찾을 수 없습니다: {}, {}", email, provider);
+                log.error("사용자를 찾을 수 없습니다: {}, {}", email, providerEnum);
                 String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                         .queryParam("error", "true")
                         .build().toUriString();

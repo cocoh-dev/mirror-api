@@ -1,16 +1,17 @@
 package kr.cocoh.api.security;
 
+import java.io.IOException;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
                 // 액세스 토큰이 만료된 경우 리프레시 토큰으로 갱신 시도
                 String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-                if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+                if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)) {
                     // 리프레시 토큰이 유효하면 새 액세스 토큰 발급 로직을 여기에 구현
                     // 이 예제에서는 생략하고 다른 곳에서 구현할 예정
                 }
